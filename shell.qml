@@ -118,7 +118,7 @@ Scope {
         const eOutputPath = shellEscape(outputPath);
         const eGeom = shellEscape(geom);
 
-        const grimRegion = `timeout 5 grim -l 1 -g ${eGeom}`;
+        const grimRegion = `sleep 0.2 && timeout 5 grim -l 1 -g ${eGeom}`;
 
         const shareCmd = "kdeconnect-cli -l | grep 'reachable' | grep -oP '[a-f0-9-]{8,}'"
             + " | head -1 | xargs -I{} sh -c"
@@ -162,8 +162,22 @@ Scope {
             cmd = defaultTempCommand;
         else
             cmd = defaultSaveCommand;
-        screenshotProcess.command = ["sh", "-c", cmd];
-        screenshotProcess.running = true;
+
+        let finalCmd = cmd;
+        if (!root.tempActive && theme.postSaveHook && root.lastSavedPath) {
+            const hookFilePath = root.lastSavedPath;
+            const hookFileName = hookFilePath.substring(hookFilePath.lastIndexOf('/') + 1);
+            const hookDirPath = hookFilePath.substring(0, hookFilePath.lastIndexOf('/'));
+            let hookCmd = theme.postSaveHook;
+            hookCmd = hookCmd.replace(/%f/g, shellEscape(hookFilePath));
+            hookCmd = hookCmd.replace(/%n/g, shellEscape(hookFileName));
+            hookCmd = hookCmd.replace(/%d/g, shellEscape(hookDirPath));
+            hookCmd = hookCmd.replace(/%t/g, shellEscape(root.lastTimestamp));
+            finalCmd += ` && ${hookCmd}`;
+        }
+
+        Quickshell.execDetached(["sh", "-c", finalCmd]);
+        Qt.quit();
     }
 
     Component.onCompleted: {
