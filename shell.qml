@@ -130,9 +130,8 @@ Scope {
 
         const sattyCommand =
             `${mkdirCmd} && ${grimRegion} - `
-            + `| satty --filename - --output-filename ${eOutputPath} --early-exit --init-tool brush `
-            + `&& wl-copy --type image/png < ${eOutputPath}`
-            + `${maybeShare(eOutputPath)}`;
+            + `| satty --filename - --output-filename ${eOutputPath} --early-exit --init-tool brush --copy-command "wl-copy --type image/png" `
+            + `; if [ -f ${eOutputPath} ]; then wl-copy --type image/png < ${eOutputPath}${maybeShare(eOutputPath)}; fi`;
         const gradiaCommand =
             `${mkdirCmd} && ${grimRegion} ${eOutputPath} `
             + `&& hyprctl dispatch exec -- "gradia ${eOutputPath} || flatpak run be.alexandervanhee.gradia ${eOutputPath}"`;
