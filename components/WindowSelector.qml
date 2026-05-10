@@ -33,8 +33,19 @@ Item {
     id: root
 
     property var monitor: Hyprland.focusedMonitor
-    property var workspace: monitor?.activeWorkspace
-    property var windows: workspace?.toplevels ?? []
+    property var windows: {
+        const list = [];
+        const toplevels = Hyprland.toplevels;
+        const all = (typeof toplevels.values === 'function') ? Array.from(toplevels.values()) : (toplevels.values || toplevels);
+        
+        for (let i = 0; i < all.length; i++) {
+            const w = all[i];
+            if (w && w.monitor && root.monitor && w.monitor.name === root.monitor.name) {
+                list.push(w);
+            }
+        }
+        return list;
+    }
 
     signal regionSelected(real x, real y, real width, real height)
     property alias pressed: mouseArea.pressed
