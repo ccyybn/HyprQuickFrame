@@ -72,7 +72,6 @@ Scope {
                 continue;
             }
         }
-        console.log("Parsed TOML:", JSON.stringify(result));
         return result;
     }
 
@@ -163,12 +162,8 @@ Scope {
         else
             cmd = defaultSaveCommand;
 
-        // Store the command for the delayed capture timer
         root._pendingCmd = cmd;
-
         root.capturing = true;
-
-        // Give the compositor a couple of frames to process the visibility changes
         captureDelayTimer.start();
     }
 
@@ -278,7 +273,7 @@ Scope {
     Process {
         id: connectivityProcess
 
-        command: ["sh", "-c", "timeout 2 kdeconnect-cli -l | grep 'reachable'"]
+        command: ["sh", "-c", "timeout 5 kdeconnect-cli -l | grep 'reachable'"]
         onExited: (code) => {
             root.connectivityStatus = (code === 0 ? 1 : 2);
         }
@@ -492,7 +487,7 @@ Scope {
 
                 visible: overlay.isFocused && !root.capturing
                 active: root.shareActive
-                icon: "" // "󰄜"
+                icon: ""
                 imageSource: root.connectivityStatus === 2 ? Qt.resolvedUrl("assets/icons/share-error.svg") : Qt.resolvedUrl("assets/icons/share.svg")
                 iconColor: {
                     if (root.connectivityStatus === 1)
