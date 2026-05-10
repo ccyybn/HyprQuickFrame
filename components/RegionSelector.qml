@@ -167,7 +167,6 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         cursorShape: Qt.CrossCursor
         onPressed: (mouse) => {
-            // Right-click to cancel selection
             if (mouse.button === Qt.RightButton) {
                 root.canceled = true;
                 root.clearSelection();
@@ -193,7 +192,6 @@ Item {
             }
         }
         onReleased: (mouse) => {
-            // Default to full-screen selection on zero-size input
             if (mouse.button === Qt.RightButton || root.canceled) {
                 if (mouse.buttons === 0)
                     root.canceled = false;
@@ -258,42 +256,49 @@ Item {
     }
 
     Behavior on selectionX {
-        enabled: root.animateSelection && root.globalAnimations && !root.selecting
+        enabled: root.animateSelection && root.globalAnimations
 
-        // Selection animations using spring dynamics
         SpringAnimation {
-            spring: 4
-            damping: 0.4
+            spring: 5
+            damping: 0.7
+            mass: 1.0
+            epsilon: 0.1
         }
 
     }
 
     Behavior on selectionY {
-        enabled: root.animateSelection && root.globalAnimations && !root.selecting
+        enabled: root.animateSelection && root.globalAnimations
 
         SpringAnimation {
-            spring: 4
-            damping: 0.4
+            spring: 5
+            damping: 0.7
+            mass: 1.0
+            epsilon: 0.1
         }
 
     }
 
     Behavior on selectionWidth {
-        enabled: root.animateSelection && root.globalAnimations && !root.selecting
+        enabled: root.animateSelection && root.globalAnimations
 
         SpringAnimation {
-            spring: 4
-            damping: 0.4
+            spring: 5
+            damping: 0.7
+            mass: 1.0
+            epsilon: 0.1
         }
 
     }
 
     Behavior on selectionHeight {
-        enabled: root.animateSelection && root.globalAnimations && !root.selecting
+        enabled: root.animateSelection && root.globalAnimations
 
         SpringAnimation {
-            spring: 4
-            damping: 0.4
+            spring: 5
+            damping: 0.7
+            mass: 1.0
+            epsilon: 0.1
         }
 
     }
