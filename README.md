@@ -34,7 +34,7 @@ Features a modern overlay UI with shader-based dimming, bouncy animations, and i
 
 ## 📦 Requirements
 
-1. **[Quickshell](https://github.com/outfoxxed/quickshell)**
+1. **[Quickshell](https://github.com/outfoxxed/quickshell)** 
 2. `grim` (Screen capture)
 3. `imagemagick` (Image processing)
 4. `wl-clipboard` (Clipboard support)
@@ -49,10 +49,18 @@ Features a modern overlay UI with shader-based dimming, bouncy animations, and i
 **Arch Linux:**
 
 ```bash
-sudo pacman -S grim imagemagick wl-clipboard libnotify # Add satty or gradia depending on preference
+sudo pacman -S grim imagemagick wl-clipboard libnotify satty # Add satty or gradia depending on preference
+```
+
+**Fedora:**
+
+```bash
+sudo dnf install grim ImageMagick wl-clipboard libnotify satty # Add satty or gradia depending on preference
 ```
 
 ### 2. Install Quickshell
+
+**Arch Linux:**
 
 ```bash
 yay -S quickshell-git
@@ -77,6 +85,10 @@ git clone https://github.com/Ronin-CK/HyprQuickFrame ~/.config/quickshell/HyprQu
 2. Basic Test
 
 ```bash
+# On Arch Linux:
+quickshell -c HyprQuickFrame -n
+
+# On Fedora:
 quickshell -c HyprQuickFrame -n
 ```
 
