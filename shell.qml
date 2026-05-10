@@ -29,6 +29,7 @@ Scope {
     property string lastTimestamp: ""
     readonly property real targetMenuWidth: (modes.length - (editActive ? 1 : 0) - (tempActive ? 1 : 0)) * 100 + 8
     property var theme: themeObj
+    property bool capturing: false
 
     function parseTOML(text) {
         let result = {
@@ -118,7 +119,7 @@ Scope {
         const eOutputPath = shellEscape(outputPath);
         const eGeom = shellEscape(geom);
 
-        const grimRegion = `sleep 0.2 && timeout 5 grim -l 1 -g ${eGeom}`;
+        const grimRegion = `timeout 5 grim -l 1 -g ${eGeom}`;
 
         const shareCmd = "kdeconnect-cli -l | grep 'reachable' | grep -oP '[a-f0-9-]{8,}'"
             + " | head -1 | xargs -I{} sh -c"
@@ -162,21 +163,25 @@ Scope {
         else
             cmd = defaultSaveCommand;
 
-        let finalCmd = cmd;
-        if (!root.tempActive && theme.postSaveHook && root.lastSavedPath) {
-            const hookFilePath = root.lastSavedPath;
-            const hookFileName = hookFilePath.substring(hookFilePath.lastIndexOf('/') + 1);
-            const hookDirPath = hookFilePath.substring(0, hookFilePath.lastIndexOf('/'));
-            let hookCmd = theme.postSaveHook;
-            hookCmd = hookCmd.replace(/%f/g, shellEscape(hookFilePath));
-            hookCmd = hookCmd.replace(/%n/g, shellEscape(hookFileName));
-            hookCmd = hookCmd.replace(/%d/g, shellEscape(hookDirPath));
-            hookCmd = hookCmd.replace(/%t/g, shellEscape(root.lastTimestamp));
-            finalCmd += ` && ${hookCmd}`;
-        }
+        // Store the command for the delayed capture timer
+        root._pendingCmd = cmd;
 
-        Quickshell.execDetached(["sh", "-c", finalCmd]);
-        Qt.quit();
+        root.capturing = true;
+
+        // Give the compositor a couple of frames to process the visibility changes
+        captureDelayTimer.start();
+    }
+
+    property string _pendingCmd: ""
+
+    Timer {
+        id: captureDelayTimer
+        interval: 100
+        repeat: false
+        onTriggered: {
+            screenshotProcess.command = ["sh", "-c", root._pendingCmd];
+            screenshotProcess.running = true;
+        }
     }
 
     Component.onCompleted: {
@@ -290,11 +295,12 @@ Scope {
             property bool isFocused: modelData.name === root.activeScreenName
             property var themeRef: root.theme
             property var hyprMonitor: {
-                const monitors = Hyprland.monitors.values;
-                for (const m of monitors) {
-                    if (m.name === modelData.name)
+                const monitors = Hyprland.monitors;
+                const monitorsList = (typeof monitors.values === 'function') ? Array.from(monitors.values()) : (monitors.values || monitors);
+                for (let i = 0; i < monitorsList.length; i++) {
+                    const m = monitorsList[i];
+                    if (m && m.name === modelData.name)
                         return m;
-
                 }
                 return null;
             }
@@ -394,7 +400,7 @@ Scope {
             RegionSelector {
                 id: regionSelector
 
-                visible: root.mode === "region" && overlay.isReady
+                visible: root.mode === "region" && overlay.isReady && !root.capturing
                 anchors.fill: parent
                 dimOpacity: overlay.themeRef.dimOpacity
                 borderRadius: overlay.themeRef.borderRadius
@@ -408,7 +414,7 @@ Scope {
             WindowSelector {
                 id: windowSelector
 
-                visible: root.mode === "window"
+                visible: root.mode === "window" && !root.capturing
                 anchors.fill: parent
                 monitor: overlay.hyprMonitor
                 dimOpacity: overlay.themeRef.dimOpacity
@@ -423,7 +429,7 @@ Scope {
             ControlBar {
                 id: segmentedControl
 
-                visible: overlay.isFocused && overlay.isReady
+                visible: overlay.isFocused && overlay.isReady && !root.capturing
                 modes: root.modes
                 mode: root.mode
                 tempActive: root.tempActive
@@ -448,7 +454,7 @@ Scope {
             QuickToggle {
                 id: editToggleButton
 
-                visible: overlay.isFocused
+                visible: overlay.isFocused && !root.capturing
                 active: root.editActive
                 icon: "" // "󰏫"
                 imageSource: Qt.resolvedUrl("assets/icons/edit.svg")
@@ -466,7 +472,7 @@ Scope {
             QuickToggle {
                 id: tempToggleButton
 
-                visible: overlay.isFocused
+                visible: overlay.isFocused && !root.capturing
                 active: root.tempActive
                 icon: "" // "󰏫"
                 imageSource: Qt.resolvedUrl("assets/icons/temp.svg")
@@ -484,7 +490,7 @@ Scope {
             QuickToggle {
                 id: shareToggleButton
 
-                visible: overlay.isFocused
+                visible: overlay.isFocused && !root.capturing
                 active: root.shareActive
                 icon: "" // "󰄜"
                 imageSource: root.connectivityStatus === 2 ? Qt.resolvedUrl("assets/icons/share-error.svg") : Qt.resolvedUrl("assets/icons/share.svg")
@@ -509,6 +515,7 @@ Scope {
             }
 
             Item {
+                visible: !root.capturing
                 anchors.fill: parent
                 z: 999
 
