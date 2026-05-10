@@ -167,18 +167,20 @@ Rectangle {
     Behavior on x {
         // Configuration for spring-based transitions
         SpringAnimation {
-            spring: 4
-            damping: 0.4
-            mass: 0.8
+            spring: 5
+            damping: 0.7
+            mass: 1.0
+            epsilon: 0.1
         }
 
     }
 
     Behavior on y {
         SpringAnimation {
-            spring: 4
-            damping: 0.4
-            mass: 0.8
+            spring: 5
+            damping: 0.7
+            mass: 1.0
+            epsilon: 0.1
         }
 
     }
