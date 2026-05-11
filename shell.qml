@@ -30,6 +30,7 @@ Scope {
     readonly property real targetMenuWidth: (modes.length - (editActive ? 1 : 0) - (tempActive ? 1 : 0)) * 100 + 8
     property var theme: themeObj
     property bool capturing: false
+    property bool overlaysVisible: true
 
     function parseTOML(text) {
         let result = {
@@ -165,6 +166,9 @@ Scope {
         root._pendingCmd = cmd;
         root.capturing = true;
         captureDelayTimer.start();
+        
+        if (root.editActive)
+            hideOverlaysTimer.start();
     }
 
     property string _pendingCmd: ""
@@ -177,6 +181,13 @@ Scope {
             screenshotProcess.command = ["sh", "-c", root._pendingCmd];
             screenshotProcess.running = true;
         }
+    }
+
+    Timer {
+        id: hideOverlaysTimer
+        interval: 300
+        repeat: false
+        onTriggered: root.overlaysVisible = false
     }
 
     Component.onCompleted: {
@@ -301,7 +312,7 @@ Scope {
             }
 
             targetScreen: modelData
-            visible: true
+            visible: root.overlaysVisible
             Component.onCompleted: {
                 if (isFocused)
                     cursorPosProcess.running = true;
