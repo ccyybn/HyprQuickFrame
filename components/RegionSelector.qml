@@ -202,7 +202,7 @@ Item {
             if (root.targetWidth < 5 && root.targetHeight < 5)
                 root.regionSelected(0, 0, root.width, root.height);
             else
-                root.regionSelected(Math.round(root.selectionX), Math.round(root.selectionY), Math.round(root.selectionWidth), Math.round(root.selectionHeight));
+                root.regionSelected(Math.round(root.targetX), Math.round(root.targetY), Math.round(root.targetWidth), Math.round(root.targetHeight));
             root.selecting = false;
         }
 
