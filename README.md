@@ -151,7 +151,7 @@ animations = true
 annotationTool = "satty"
 ```
 
-## 🌌 Noctalia Support
+##  Noctalia Support
 
 HyprQuickFrame can automatically sync its colors with your wallpaper using [Noctalia](https://github.com/Ronin-CK/Noctalia).
 
@@ -171,7 +171,7 @@ HyprQuickFrame can automatically sync its colors with your wallpaper using [Noct
 3. **Dynamic Toggle Colors (Optional):** To allow toggle buttons to sync dynamically, delete or comment out the `background` key under the `[toggle]` section in your `theme.toml`.
 
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Gray Screen / Blank Overlay on Nvidia
 If you are using an Nvidia GPU with the Vulkan renderer (e.g. `WLR_RENDERER=vulkan` and `QSG_RHI_BACKEND=vulkan`) and the preview overlay displays as a completely gray or blank screen, this is a known issue with Quickshell's DMABUF modifier support on Nvidia. 
