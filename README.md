@@ -34,7 +34,7 @@ Features a modern overlay UI with shader-based dimming, bouncy animations, and i
 
 ## 📦 Requirements
 
-1. **[Quickshell](https://github.com/outfoxxed/quickshell)** 
+1. **[Quickshell](https://github.com/outfoxxed/quickshell)** (or `noctalia-qs` on Fedora)
 2. `grim` (Screen capture)
 3. `imagemagick` (Image processing)
 4. `wl-clipboard` (Clipboard support)
@@ -89,7 +89,7 @@ git clone https://github.com/Ronin-CK/HyprQuickFrame ~/.config/quickshell/HyprQu
 quickshell -c HyprQuickFrame -n
 
 # On Fedora:
-quickshell -c HyprQuickFrame -n
+noctalia-qs -c HyprQuickFrame -n
 ```
 
 ## ❄️ Nix Installation
@@ -170,6 +170,20 @@ HyprQuickFrame can automatically sync its colors with your wallpaper using [Noct
    ```
 3. **Dynamic Toggle Colors (Optional):** To allow toggle buttons to sync dynamically, delete or comment out the `background` key under the `[toggle]` section in your `theme.toml`.
 
+
+## 🐛 Troubleshooting
+
+### Gray Screen / Blank Overlay on Nvidia
+If you are using an Nvidia GPU with the Vulkan renderer (e.g. `WLR_RENDERER=vulkan` and `QSG_RHI_BACKEND=vulkan`) and the preview overlay displays as a completely gray or blank screen, this is a known issue with Quickshell's DMABUF modifier support on Nvidia. 
+
+To fix this, you must launch HyprQuickFrame with the `QS_DISABLE_DMABUF=1` environment variable.
+
+You can modify your `hyprland.conf` bindings to include this variable:
+```ini
+bind = SUPER SHIFT, S, exec, env QS_DISABLE_DMABUF=1 quickshell -c HyprQuickFrame -n
+bind = SUPER SHIFT, W, exec, env QS_DISABLE_DMABUF=1 HQF_MODE=window quickshell -c HyprQuickFrame -n
+bind = SUPER SHIFT, C, exec, env QS_DISABLE_DMABUF=1 HQF_ACTION=temp quickshell -c HyprQuickFrame -n
+```
 
 ## ⚖️ License & Attribution
 
